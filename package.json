@@ -1,0 +1,31 @@
+{
+  "name": "asyncdi",
+  "version": "1.0.0",
+  "description": "Async Dependency Injection Library",
+  "main": "index.js",
+  "author": "Jed Watson",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JedWatson/asyncdi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JedWatson/asyncdi/issues"
+  },
+  "homepage": "https://github.com/JedWatson/asyncdi",
+  "dependencies": {
+    "async": "^0.9.0",
+    "lodash": "^3.4.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "async",
+    "di",
+    "dependency",
+    "injection",
+    "function",
+    "library"
+  ]
+}
