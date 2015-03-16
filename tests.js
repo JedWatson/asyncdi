@@ -9,6 +9,7 @@ var thrownErr = new Error("Should've been caught by asyncdi");
 
 var fn_basic = function() { return true; };
 var fn_async = function(callback) { setTimeout(callback, 0, null, true) };
+var fn_next = function(next){ return true; };
 var fn_one = function(one) { return true; };
 var fn_scope = function(){ return this; };
 var fn_error = function() { throw thrownErr };
@@ -53,6 +54,11 @@ describe('AsyncDI', function() {
 	describe('fn_async.isAsync', function() {
 		it('must be async', function() {
 			demand(di(fn_async).isAsync).be.true();
+		});
+	});
+	describe('fn_next.isAsync', function() {
+		it('must be async, if so configured', function() {
+			demand(di(fn_next, null, {callback:"next"}).isAsync).be.true();
 		});
 	});
 	describe('fn_basic.deps', function() {

@@ -16,8 +16,8 @@ var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
  * @param  {Function} fn
  * @return {Wrapper}
  */
-exports = module.exports = function(fn, context) {
-	return new Wrapper(fn, context);
+exports = module.exports = function(fn, context, opts) {
+	return new Wrapper(fn, context, opts);
 };
 
 /**
@@ -26,7 +26,7 @@ exports = module.exports = function(fn, context) {
  * @param {Function} fn
  * @param {Object} context
  */
-var Wrapper = exports.Wrapper = function Wrapper(fn, context) {
+var Wrapper = exports.Wrapper = function Wrapper(fn, context, opts) {
 	
 	// Ensure a new instance has been created.
 	// Calling Wrapper as a function will return a new instance instead.
@@ -37,6 +37,14 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context) {
 	// Ensure a function has actually been provided.
 	if (!_.isFunction(fn)) {
 		throw new Error('AsyncDI Wrapper must be initialised with a function');
+	}
+	
+	this.options = _.defaults({}, opts, {
+		callback: ["callback"]
+	});
+	
+	if (_.isString(this.options.callback)) {
+		this.options.callback=[this.options.callback];
 	}
 	
 	// Save the function
@@ -58,7 +66,7 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context) {
 	// If the last argument is named 'callback', the function is async.
 	// The callback is removed from the dependencies so it doesn't get considered
 	// when this.provides() is called
-	if (_.last(this.deps) === 'callback') {
+	if (this.options.callback.indexOf(_.last(this.deps))>-1) {
 		this.isAsync = true;
 		this.deps.pop();
 	}
