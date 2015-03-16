@@ -39,6 +39,11 @@ describe('AsyncDI', function() {
 			demand(di(fn_async).isAsync).be.true();
 		});
 	});
+	describe('fn_basic.deps', function() {
+		it('must be empty', function() {
+			demand(di(fn_async).deps).eql([]);
+		});
+	});
 	describe('fn_basic.call(callback)', function() {
 		it('must callback(null, true)', function(done) {
 			di(fn_basic).call(function(err, val) {
