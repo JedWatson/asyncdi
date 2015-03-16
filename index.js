@@ -43,7 +43,7 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context) {
 	this.fn = fn;
 	
 	// Detect the dependencies using the regex
-	this.deps = fn.toString().match(FN_ARGS)[1].split(',').map(function(i) { return i.trim(); });
+	this.deps = fn.toString().match(FN_ARGS)[1].split(',').map(function(i) { return i.trim(); }).filter(function(i) { return i; });
 	
 	// Create a map of dependency names for easy presence detection
 	this.requires = {};
