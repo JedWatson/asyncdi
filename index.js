@@ -64,7 +64,7 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context) {
 	
 	// The internal provides object maps dependencies that can be provided if
 	// requested by the function
-	this._provides = {};
+	this._provides = null;
 	
 	// The internal arguments array contains the provided deps mapped to the
 	// arguments requested, and is ready to be applied to the function
@@ -76,14 +76,23 @@ _.extend(Wrapper.prototype, {
 	
 	/**
 	 * Registers dependencies that can be provided to the function
-	 * @param  {Object} provides map of key: value pairs
+	 * @param  {Object|Array} provides map of key: value pairs or an array of values
 	 * @return {Wrapper} this instance
 	 */
 	provides: function(provides) {
-		_.extend(this._provides, provides);
-		this._arguments = _.map(this.deps, function(key) {
-			return this._provides[key];
-		}, this);
+		if(_.isArray(provides)){
+			if(!this._provides){
+				this._provides = provides;
+			}else{
+				this._provides.concat(provides);
+			}
+			this._arguments = this._provides;
+		}else{
+			this._provides = _.extend({}, this._provides, provides);
+			this._arguments = _.map(this.deps, function(key) {
+				return this._provides[key];
+			}, this);
+		}
 		return this;
 	},
 	
