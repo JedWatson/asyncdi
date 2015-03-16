@@ -1,6 +1,6 @@
 {
   "name": "asyncdi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Async Dependency Injection Library",
   "main": "index.js",
   "author": "Jed Watson",
