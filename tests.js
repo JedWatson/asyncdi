@@ -1,3 +1,6 @@
+/* global describe, it */
+/* jshint unused:false */
+
 var demand = require('must'),
 	di = require('./index');
 
@@ -8,6 +11,10 @@ var fn_async = function(callback) { setTimeout(callback, 500, null, true) };
 var fn_one = function(one) { return true; };
 var fn_scope = function(){ return this; };
 var fn_error = function() { throw thrownErr };
+var fn_overwritten_toString = function(){ return true};
+fn_overwritten_toString.toString = function(){
+	return "toString overwritten";
+};
 var scope = {};
 var notAFunction = {};
 
@@ -27,6 +34,13 @@ describe('AsyncDI', function() {
 			demand(function(){
 				di(notAFunction);
 			}).to.throw(/function/i);
+		});
+	});
+	describe('(fn_overwritten_toString)', function(){
+		it("should not throw an error", function(){
+			demand(function(){
+				di(fn_overwritten_toString);
+			}).to.not.throw();
 		});
 	});
 	describe('fn_basic.isAsync', function() {
