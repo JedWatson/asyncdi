@@ -7,7 +7,7 @@ var demand = require('must'),
 var thrownErr = new Error("Should've been caught by asyncdi");
 
 var fn_basic = function() { return true; };
-var fn_async = function(callback) { setTimeout(callback, 500, null, true) };
+var fn_async = function(callback) { setTimeout(callback, 0, null, true) };
 var fn_one = function(one) { return true; };
 var fn_scope = function(){ return this; };
 var fn_error = function() { throw thrownErr };
