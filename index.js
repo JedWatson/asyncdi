@@ -16,8 +16,8 @@ var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
  * @param  {Function} fn
  * @return {Wrapper}
  */
-exports = module.exports = function(fn, context) {
-	return new Wrapper(fn, context);
+exports = module.exports = function(fn, context, opts) {
+	return new Wrapper(fn, context, opts);
 };
 
 /**
@@ -26,7 +26,7 @@ exports = module.exports = function(fn, context) {
  * @param {Function} fn
  * @param {Object} context
  */
-var Wrapper = exports.Wrapper = function Wrapper(fn, context) {
+var Wrapper = exports.Wrapper = function Wrapper(fn, context, opts) {
 	
 	// Ensure a new instance has been created.
 	// Calling Wrapper as a function will return a new instance instead.
@@ -39,11 +39,23 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context) {
 		throw new Error('AsyncDI Wrapper must be initialised with a function');
 	}
 	
+	this.options = _.defaults({}, opts, {
+		callback: ["callback"]
+	});
+	
+	if (_.isString(this.options.callback)) {
+		this.options.callback=[this.options.callback];
+	}
+	
 	// Save the function
 	this.fn = fn;
 	
 	// Detect the dependencies using the regex
-	this.deps = fn.toString().match(FN_ARGS)[1].split(',').map(function(i) { return i.trim(); }).filter(function(i) { return i; });
+	this.deps = Function.toString.call(fn)
+		.match(FN_ARGS)[1]
+		.split(',')
+		.map(function(i) { return i.trim(); })
+		.filter(function(i) { return i; });
 	
 	// Create a map of dependency names for easy presence detection
 	this.requires = {};
@@ -54,7 +66,7 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context) {
 	// If the last argument is named 'callback', the function is async.
 	// The callback is removed from the dependencies so it doesn't get considered
 	// when this.provides() is called
-	if (_.last(this.deps) === 'callback') {
+	if (this.options.callback.indexOf(_.last(this.deps))>-1) {
 		this.isAsync = true;
 		this.deps.pop();
 	}
@@ -64,7 +76,7 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context) {
 	
 	// The internal provides object maps dependencies that can be provided if
 	// requested by the function
-	this._provides = {};
+	this._provides = null;
 	
 	// The internal arguments array contains the provided deps mapped to the
 	// arguments requested, and is ready to be applied to the function
@@ -76,14 +88,18 @@ _.extend(Wrapper.prototype, {
 	
 	/**
 	 * Registers dependencies that can be provided to the function
-	 * @param  {Object} provides map of key: value pairs
+	 * @param  {Object|Array} provides map of key: value pairs or an array of values
 	 * @return {Wrapper} this instance
 	 */
 	provides: function(provides) {
-		_.extend(this._provides, provides);
-		this._arguments = _.map(this.deps, function(key) {
-			return this._provides[key];
-		}, this);
+		if (_.isArray(provides)) {
+			this._arguments = this._provides = (!this._provides) ? provides : this._provides.concat(provides);
+		}else{
+			this._provides = _.extend({}, this._provides, provides);
+			this._arguments = _.map(this.deps, function(key) {
+				return this._provides[key];
+			}, this);
+		}
 		return this;
 	},
 	
