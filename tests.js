@@ -1,13 +1,20 @@
+/* global describe, it */
+/* jshint unused:false */
+
 var demand = require('must'),
 	di = require('./index');
 
 var thrownErr = new Error("Should've been caught by asyncdi");
 
 var fn_basic = function() { return true; };
-var fn_async = function(callback) { setTimeout(callback, 500, null, true) };
+var fn_async = function(callback) { setTimeout(callback, 0, null, true) };
 var fn_one = function(one) { return true; };
 var fn_scope = function(){ return this; };
 var fn_error = function() { throw thrownErr };
+var fn_overwritten_toString = function(){ return true};
+fn_overwritten_toString.toString = function(){
+	return "toString overwritten";
+};
 var scope = {};
 var notAFunction = {};
 
@@ -22,11 +29,18 @@ describe('AsyncDI', function() {
 			di(fn_basic).must.be.an.instanceof(di.Wrapper);
 		});
 	});
-	describe('(notAFunction)', function(){
-		it('must throw an error', function(){
+	describe('(notAFunction)', function() {
+		it('must throw an error', function() {
 			demand(function(){
 				di(notAFunction);
 			}).to.throw(/function/i);
+		});
+	});
+	describe('(fn_overwritten_toString)', function() {
+		it("should not throw an error", function() {
+			demand(function(){
+				di(fn_overwritten_toString);
+			}).to.not.throw();
 		});
 	});
 	describe('fn_basic.isAsync', function() {
@@ -77,15 +91,15 @@ describe('AsyncDI', function() {
 			demand(di(fn_one).requires.two).be.undefined();
 		});
 	});
-	describe('(fn_scope).call(scope, callback)', function(){
-		it('must return scope', function(done){
-			di(fn_scope).call(scope, function(err, val){
+	describe('(fn_scope).call(scope, callback)', function() {
+		it('must return scope', function(done) {
+			di(fn_scope).call(scope, function(err, val ){
 				demand(val).equal(scope);
 				done();
 			});
 		});
 	});
-	describe('(fn_scope, scope).call(callback)', function(){
+	describe('(fn_scope, scope).call(callback)', function() {
 		it('must return scope', function(done){
 			di(fn_scope, scope).call(function(err, val){
 				demand(val).equal(scope);
@@ -93,8 +107,8 @@ describe('AsyncDI', function() {
 			});
 		});
 	});
-	describe('(fn_error).call(callback)', function(){
-		it('must return thrownErr', function(done){
+	describe('(fn_error).call(callback)', function() {
+		it('must return thrownErr', function(done) {
 			di(fn_error).call(function(err, val){
 				demand(err).equal(thrownErr);
 				done();
