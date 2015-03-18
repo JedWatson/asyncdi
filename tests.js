@@ -1,5 +1,6 @@
 var demand = require('must'),
-	di = require('./index');
+	di = require('./index'),
+	_ = require('lodash');
 
 var thrownErr = new Error("Should've been caught by asyncdi");
 
@@ -8,6 +9,7 @@ var fn_async = function(callback) { setTimeout(callback, 500, null, true) };
 var fn_one = function(one) { return true; };
 var fn_scope = function(){ return this; };
 var fn_error = function() { throw thrownErr };
+var fn_reflect_args = function() { return _.toArray(arguments); };
 var scope = {};
 var notAFunction = {};
 
@@ -75,6 +77,16 @@ describe('AsyncDI', function() {
 	describe('fn_one.requires', function() {
 		it('must not require `two`', function() {
 			demand(di(fn_one).requires.two).be.undefined();
+		});
+	});
+	describe('(fn_reflect_args).provides', function() {
+		it('accept an array of values', function(done) {
+			var a={},
+				b={};
+			di(fn_reflect_args).provides([a,b]).call(function(err, val) {
+				demand(val).eql([a,b]);
+				done();
+			});
 		});
 	});
 	describe('(fn_scope).call(scope, callback)', function(){

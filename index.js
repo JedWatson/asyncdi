@@ -80,13 +80,8 @@ _.extend(Wrapper.prototype, {
 	 * @return {Wrapper} this instance
 	 */
 	provides: function(provides) {
-		if(_.isArray(provides)){
-			if(!this._provides){
-				this._provides = provides;
-			}else{
-				this._provides.concat(provides);
-			}
-			this._arguments = this._provides;
+		if (_.isArray(provides)) {
+			this._arguments = this._provides = (!this._provides) ? provides : this._provides.concat(provides);
 		}else{
 			this._provides = _.extend({}, this._provides, provides);
 			this._arguments = _.map(this.deps, function(key) {
