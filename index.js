@@ -40,11 +40,11 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context, opts) {
 	}
 	
 	this.options = _.defaults({}, opts, {
-		callback: ["callback"]
+		callback: ['callback']
 	});
 	
 	if (_.isString(this.options.callback)) {
-		this.options.callback=[this.options.callback];
+		this.options.callback = [this.options.callback];
 	}
 	
 	// Save the function
@@ -66,7 +66,7 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context, opts) {
 	// If the last argument is named 'callback', the function is async.
 	// The callback is removed from the dependencies so it doesn't get considered
 	// when this.provides() is called
-	if (this.options.callback.indexOf(_.last(this.deps))>-1) {
+	if (this.options.callback.indexOf(_.last(this.deps)) > -1) {
 		this.isAsync = true;
 		this.deps.pop();
 	}
@@ -94,7 +94,7 @@ _.extend(Wrapper.prototype, {
 	provides: function(provides) {
 		if (_.isArray(provides)) {
 			this._arguments = this._provides = (!this._provides) ? provides : this._provides.concat(provides);
-		}else{
+		} else {
 			this._provides = _.extend({}, this._provides, provides);
 			this._arguments = _.map(this.deps, function(key) {
 				return this._provides[key];
