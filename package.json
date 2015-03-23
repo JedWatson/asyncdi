@@ -14,7 +14,8 @@
   },
   "homepage": "https://github.com/JedWatson/asyncdi",
   "scripts": {
-    "test": "mocha tests.js"
+    "test": "mocha tests.js",
+    "lint": "eslint ./; true"
   },
   "keywords": [
     "async",
@@ -29,6 +30,7 @@
     "lodash": "^3.5.0"
   },
   "devDependencies": {
+    "eslint": "^0.17.1",
     "mocha": "^2.2.1",
     "must": "^0.12.0"
   }
