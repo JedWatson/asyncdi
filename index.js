@@ -1,15 +1,11 @@
 var _ = require('lodash'),
 	async = require('async');
-
 /**
  * Asynchronous Dependency Injection Library
  */
-
 // This regex detects the arguments portion of a function definition
 // Thanks to Angular for the regex
 var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
-
-
 /**
  * Calling the module directly returns a new Wrapper instance
  * 
@@ -19,7 +15,6 @@ var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
 exports = module.exports = function(fn, context, opts) {
 	return new Wrapper(fn, context, opts);
 };
-
 /**
  * Wrapper Class
  * 
@@ -27,42 +22,38 @@ exports = module.exports = function(fn, context, opts) {
  * @param {Object} context
  */
 var Wrapper = exports.Wrapper = function Wrapper(fn, context, opts) {
-	
 	// Ensure a new instance has been created.
 	// Calling Wrapper as a function will return a new instance instead.
 	if (!(this instanceof Wrapper)) {
 		return new Wrapper(fn, context);
 	}
-	
 	// Ensure a function has actually been provided.
 	if (!_.isFunction(fn)) {
 		throw new Error('AsyncDI Wrapper must be initialised with a function');
 	}
-	
 	this.options = _.defaults({}, opts, {
 		callback: ['callback']
 	});
-	
 	if (_.isString(this.options.callback)) {
 		this.options.callback = [this.options.callback];
 	}
-	
 	// Save the function
 	this.fn = fn;
-	
 	// Detect the dependencies using the regex
 	this.deps = Function.toString.call(fn)
 		.match(FN_ARGS)[1]
 		.split(',')
-		.map(function(i) { return i.trim(); })
-		.filter(function(i) { return i; });
-	
+		.map(function(i) {
+ return i.trim(); 
+})
+		.filter(function(i) {
+ return i; 
+});
 	// Create a map of dependency names for easy presence detection
 	this.requires = {};
 	this.deps.forEach(function(i) {
 		this.requires[i] = true;
 	}, this);
-	
 	// If the last argument is named 'callback', the function is async.
 	// The callback is removed from the dependencies so it doesn't get considered
 	// when this.provides() is called
@@ -70,22 +61,16 @@ var Wrapper = exports.Wrapper = function Wrapper(fn, context, opts) {
 		this.isAsync = true;
 		this.deps.pop();
 	}
-	
 	// Save the context (may be changed later)
 	this._context = context;
-	
 	// The internal provides object maps dependencies that can be provided if
 	// requested by the function
 	this._provides = null;
-	
 	// The internal arguments array contains the provided deps mapped to the
 	// arguments requested, and is ready to be applied to the function
 	this._arguments = [];
-	
 };
-
 _.extend(Wrapper.prototype, {
-	
 	/**
 	 * Registers dependencies that can be provided to the function
 	 * @param  {Object|Array} provides map of key: value pairs or an array of values
@@ -102,7 +87,6 @@ _.extend(Wrapper.prototype, {
 		}
 		return this;
 	},
-	
 	/**
 	 * Changes the context of the function to the object provided
 	 * @param  {Object} context
@@ -112,7 +96,6 @@ _.extend(Wrapper.prototype, {
 		this._context = context;
 		return this;
 	},
-	
 	/**
 	 * Calls the function
 	 * 
@@ -140,7 +123,7 @@ _.extend(Wrapper.prototype, {
 				// The return value of the function will be the second argument.
 				try {
 					callback(null, this.fn.apply(context, this._arguments));
-				} catch(e) {
+				} catch (e) {
 					callback(e);
 				}
 			} else {
@@ -149,7 +132,6 @@ _.extend(Wrapper.prototype, {
 			}
 		}
 	},
-	
 	/**
 	 * Applies the function iterator to each item in arr, in parallel.
 	 * 
@@ -164,14 +146,14 @@ _.extend(Wrapper.prototype, {
 			return async.each(arr, function(item, cb) {
 				wrapper.call(item, cb);
 			}, callback);
-		} else {
+		} 
 			arr.each(function(item) {
 				wrapper.call(item);
 			});
-			if (callback) { callback(); }
-		}
+			if (callback) {
+ callback(); 
+}
 	},
-	
 	/**
 	 * Returns the results of interating the function on each item in an array.
 	 * 
@@ -193,5 +175,4 @@ _.extend(Wrapper.prototype, {
 			}));
 		}
 	}
-	
 });
